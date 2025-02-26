@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dress Search</title>
+<link  href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+     body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      background-color: #f8f9fa;
+    }
+
+    header {
+      background: #939697;
+      /* background: #d2d6d7; */
+      color: #fff;
+      padding: 0px 0px;
+      text-align: center;
+      min-height: 250px;
+    }
+
+h1 {
+            /* font-family: 'Montserrat', sans-serif; */
+            font-family: 'Courier New', monospace;
+            font-size:xx-large;
+            font-weight: bold;
+            /* font-weight: 300;  */
+        }
+
+    form {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 15px;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    form input,
+    form select {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    form button {
+      width: 100%;
+      padding: 10px 15px;
+      background: #939697;
+      /* background: #d2d6d7; */
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    form button:hover {
+      background: #0056b3;
+    }
+
+    .results {
+      max-width: 500px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 15px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    .result-item {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+
+    .result-item h3 {
+      margin: 5px 0;
+    }
+
+    .result-item img {
+      display: block;
+      margin-top: 10px;
+      max-width: 200px;
+      height: auto;
+    }
+
+    .no-results {
+      text-align: center;
+      color: #555;
+    }
+
+    .upload-container .input-row {
+    display: grid;
+    grid-template-columns: auto 1fr; /* File input takes auto width, drop zone fills remaining space */
+    align-items: center; /* Vertically center items */
+    gap: 10px; /* Space between file input and drop zone */
+}
+
+.upload-container #dropZone {
+    border: 2px dashed #ccc;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer; /* Indicate it's clickable */
+}
+
+.upload-container #dropZone:hover {
+    border-color: #000; /* Visual feedback on hover */
+}
+
+/* .preview {
+    display: none; 
+    max-width: 150px; 
+    height: auto; 
+    margin: 10px auto;
+} */
+
+#preview {
+    display: none; /* Initially hidden */
+    width: 200px; /* Set a fixed width */
+    height: 200px; /* Set a fixed height */
+    object-fit: cover; /* Ensure the image fits within the dimensions without stretching */
+    margin: 10px auto; /* Center the image horizontally */
+  
+}
+
+  </style>
+</head>
+<body>
+    <header>
+        <img src="static/logoEcommax0001.png" alt="Logo" style="float:left;">
+        <img src="static/girlbag2.png" height="250" width="293" alt="Logo" style="float:right;"><br>
+        <h1 style="font-family: Arial, Helvetica, sans-serif;"><b>Chic Dresses, Effortless Style</b><br><br> Find the One That Speaks to You</h1>
+    </header>
+    
+
+    <!-- <div class="upload-container">
+      <form action="/" method="POST" enctype="multipart/form-data">
+          <input type="file" id="imageInput" name="image" accept="image/*" required placeholder="Upload Image">
+          <br>
+  
+          <div id="dropZone" style="border: 2px dashed #ccc; padding: 20px; text-align: center; margin: 10px 0;">
+              Drag and drop an image here or click to select a file.
+          </div>
+    
+          <img id="preview" alt="Image Preview" style="display: none; max-width: 100%; height: auto;">
+          <br>
+          <button type="submit">Search</button>
+      </form>
+  </div> -->
+
+  <div class="upload-container">
+    <form action="/" method="POST" enctype="multipart/form-data">
+        <div class="input-row">
+            <div id="dropZone">
+                Drag and drop an image here or click to select a file.
+            </div>
+            <input type="file" id="imageInput" name="image" accept="image/*" required placeholder="Upload Image">
+        </div>
+        <br>
+        <img id="preview" alt="Image Preview" style="display: none; max-width: 100%; height: auto;">
+        <br>
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+
+
+  <script>
+      const fileInput = document.getElementById("imageInput");
+      const dropZone = document.getElementById("dropZone");
+      const preview = document.getElementById("preview");
+  
+      // Handle file selection via file input
+      fileInput.addEventListener("change", function(event) {
+          const file = event.target.files[0];
+          if (file) {
+              displayImage(file);
+          }
+      });
+  
+      // Handle drag-and-drop
+      dropZone.addEventListener("dragover", function(event) {
+          event.preventDefault();
+          dropZone.style.borderColor = "#000"; // Visual feedback
+      });
+  
+      dropZone.addEventListener("dragleave", function(event) {
+          event.preventDefault();
+          dropZone.style.borderColor = "#ccc"; // Reset border color
+      });
+  
+      dropZone.addEventListener("drop", function(event) {
+          event.preventDefault();
+          dropZone.style.borderColor = "#ccc"; // Reset border color
+          const file = event.dataTransfer.files[0]; // Get the dropped file
+          if (file && file.type.startsWith("image/")) {
+              fileInput.files = event.dataTransfer.files; // Set the file input's files
+              displayImage(file);
+          } else {
+              alert("Please drop a valid image file.");
+          }
+      });
+  
+      // Display the image preview
+      function displayImage(file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              preview.src = e.target.result;
+              preview.style.display = "block"; // Show the preview
+          };
+          reader.readAsDataURL(file);
+      }
+  
+      // Allow clicking the drop zone to trigger the file input
+      dropZone.addEventListener("click", function() {
+          fileInput.click();
+      });
+  </script>
+  
+  <div class="results">
+      {% if results %}
+          <p><strong>Search Method:</strong> Image search with embedding <strong>img2vec_neural</strong></p>
+          <ul>
+              {% for result in results %}
+                  {% set props = result.properties %}
+                  <div class="result-item">
+                      <p><strong>{{ props.title }}</strong></p>
+                      {% if props.file_id %}
+                          <center>
+                              <img src="{{ url_for('static', filename='images/' ~ props.file_id ~ '.jpg') }}" alt="Image">
+                          </center>
+                      {% endif %}
+                  </div>
+              {% endfor %}
+          </ul>
+      {% elif results is defined and results is not none %}
+          <!-- Do not show "no results found" if there is no query -->
+      {% endif %}
+  </div>
+
+
+
+    <!-- <div class="upload-container">
+      <form action="/" method="POST" enctype="multipart/form-data">
+          <input type="file" id="imageInput" name="image" accept="image/*" required placeholder="Upload Image">
+          <br>
+          <img id="preview" alt="Image Preview" style="display: none;"> 
+          <br>
+          <button type="submit">Search</button>
+      </form>
+  </div>
+  
+  <script>
+      document.getElementById("imageInput").addEventListener("change", function(event) {
+          const file = event.target.files[0];
+          const preview = document.getElementById("preview");
+          if (file) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                  preview.src = e.target.result;
+                  preview.style.display = "block"; 
+              };
+              reader.readAsDataURL(file);
+          } else {
+              preview.style.display = "none"; 
+          }
+      });
+  </script>
+  
+  <div class="results">
+      {% if results %}
+          <p><strong>Search Method:</strong> Image search with embedding <strong>img2vec_neural</strong></p>
+          <ul>
+              {% for result in results %}
+                  {% set props = result.properties %}
+                  <div class="result-item">
+                      <p><strong>{{ props.title }}</strong></p>
+                      {% if props.file_id %}
+                          <center>
+                              <img src="{{ url_for('static', filename='images/' ~ props.file_id ~ '.jpg') }}" alt="Image">
+                          </center>
+                      {% endif %}
+                  </div>
+              {% endfor %}
+          </ul>
+      {% elif results is defined and results is not none %}
+  
+      {% endif %}
+  </div> -->
+
+
+
+
+
+    <!-- <div class="upload-container">
+        <form action="/" method="POST" enctype="multipart/form-data">
+            <input type="file" id="imageInput" name="image" accept="image/*" required placeholder="upload Image">
+            <br>
+            <img id="preview" alt="Image Preview">
+        <br>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+    <script>
+      document.getElementById("imageInput").addEventListener("change", function(event) {
+          const file = event.target.files[0];
+          if (file) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                  const preview = document.getElementById("preview");
+                  preview.src = e.target.result;
+                  preview.style.display = "block";
+              };
+              reader.readAsDataURL(file);
+          }
+      });
+  </script>
+
+    <div class="results">                
+      {% if results %}
+        <p><strong>Search Method:</strong> Image search with embedding <strong>img2vec_neural</strong></p>
+
+        <ul>
+            {% for result in results %}
+  {% set props = result.properties %}
+                <div class="result-item">
+                    <p><strong>{{ props.title }}</strong></p>
+                    {% if props.file_id %}
+                        <center><img src="{{ url_for('static', filename='images/' ~ props.file_id ~ '.jpg') }}" 
+                            alt="Image"></center>
+                    {% endif %}
+            
+                  </div>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-results">No results found.</p>
+    {% endif %}
+
+  </div>   -->
+
+</body>
+</html>
+

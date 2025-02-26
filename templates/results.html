@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Search Results</title>
+</head>
+<body>
+  <h2>Search: "{{ query }}"</h2>
+
+  {% if results %}
+    <ul>
+      {% for obj in results %}
+        {% set props = obj.properties %}
+        <li>
+          <h3>Title: {{ props.title }}</h3>
+          <p>Review: {{ props.review_text }}</p>
+          <p>Rating: {{ props.rating }}</p>
+
+          <!-- The product / clothing ID is used to fetch a local image -->
+          {% if props.clothing_id %}
+            <img src="{{ url_for('static', filename='images/' ~ props.clothing_id ~ '.jpg') }}"
+                 alt="Image for {{ props.clothing_id }}"
+                 width="200"
+                 height="auto">
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No results found.</p>
+  {% endif %}
+</body>
+</html>

@@ -1,0 +1,35 @@
+
+name: Build and Push to JFrog
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-versions: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+ 
+      - name: Build Package
+        run: python setup.py sdist bdist_wheel
+
+      - name: Publish to JFrog Artifactory
+        uses: jfrog/setup-jfrog-cli@v4
+
+
+      - name: Upload package to Artifactory
+        run: |
+          twine upload --repository-url https://trialc38vpm.jfrog.io/artifactory/api/pypi/dress-review-pypi-local/  -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} dist/*

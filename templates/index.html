@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+
+        label {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            display: block;
+            color: #555;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 40px;
+            color: #333;
+        }
+
+        #results {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .result-item {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow-wrap: break-word;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .result-item img {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            margin-right: 20px;
+        }
+
+        .result-details {
+            flex: 1;
+        }
+
+        .result-details h3 {
+            margin-top: 0;
+            color: #007BFF;
+            font-size: 1.5rem;
+        }
+
+        .result-details p {
+            margin: 8px 0;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .result-details .price {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .result-details .order-status {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #dc3545;
+        }
+
+        .result-details .score {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #6c757d;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+            background-color: #007BFF;
+            color: #fff;
+            border-top: 1px solid #0056b3;
+        }
+
+        .error {
+            color: red;
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Test Page</h1>
+    <form action="/search" method="POST" id="search-form">
+        <label for="query">Search Query:</label>
+        <input type="text" id="query" name="query" placeholder="Enter search query" required>
+
+        <label for="search_type">Search Type:</label>
+        <select id="search_type" name="search_type" required>
+            <option value="bm25">BM25</option>
+            <option value="vector">Vector Search</option>
+            <option value="hybrid">Hybrid (BM25 + Vector)</option>
+            <option value="rag">RAG</option>
+        </select>
+
+        <button type="submit">Search</button>
+    </form>
+
+    <h2>Search Results:</h2>
+    <div id="results"></div>
+
+    <footer>
+        <p>&copy; 2024 Search Test. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const categoryImages = {
+            "Mountain Bikes": "https://example.com/mountain-bike.jpg",
+            "Road Bikes": "https://example.com/road-bike.jpg",
+            "Hybrid Bikes": "https://example.com/hybrid-bike.jpg",
+            "Electric Bikes": "https://example.com/electric-bike.jpg",
+            "Default": "https://example.com/default-product.jpg"
+        };
+
+        document.getElementById('search-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('http://192.168.1.53:5000/search', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '';
+
+                if (data.error) {
+                    resultsDiv.innerHTML = `<p class="error">Error: ${data.error}</p>`;
+                } else if (data.length === 0) {
+                    resultsDiv.innerHTML = '<p>No results found.</p>';
+                } else {
+                    data.forEach(result => {
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'result-item';
+
+                        const category = result['Product Category'] || "Default";
+                        const categoryImgUrl = categoryImages[category] || categoryImages['Default'];
+
+                        resultItem.innerHTML = `
+                            <img src="${categoryImgUrl}" alt="${category}">
+                            <div class="result-details">
+                                <h3>${result['Product Name']}</h3>
+                                <p><strong>Description:</strong> ${result['Product Description']}</p>
+                                <p><strong>Category:</strong> ${result['Product Category'] || "N/A"}</p>
+                                <p><strong>Subcategory:</strong> ${result['Product Subcategory'] || "N/A"}</p>
+                                <p><strong>Weight:</strong> ${result['Product Weight'] || "N/A"} lbs</p>
+                                <p><strong>Size:</strong> ${result['Product Size'] || "N/A"}</p>
+                                <p class="price"><strong>Price:</strong> $${result['Product Price'] || "N/A"}</p>
+                                <p class="order-status"><strong>Order Status:</strong> ${result['Order Status'] || "N/A"}</p>
+                                <p class="score"><strong>Score:</strong> ${result['Score'] || "N/A"}</p>
+                            </div>
+                        `;
+
+                        resultsDiv.appendChild(resultItem);
+                    });
+                }
+            })
+            .catch(error => {
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
