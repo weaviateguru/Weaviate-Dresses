@@ -73,17 +73,3 @@ docker exec -it weaviate_app python3 src/tasks/upload_img_to_weaviate.py --sourc
 ### To Access the Website
 - To access text search: http://localhost:5050
 - To access image search: http://localhost:6060
-
-
-------
-docker login https://trialc38vpm.jfrog.io/
-
-- Push docker image to JFrog
-```
-docker tag dress-review https://trialc38vpm.jfrog.io/test-docker-local/dress-review:latest
-
-# push 
-docker push https://trialc38vpm.jfrog.io/test-docker-loca/dress-review:latest
-
-```
-
