@@ -32,4 +32,4 @@ jobs:
 
       - name: Upload package to Artifactory
         run: |
-          twine upload --repository-url https://trialc38vpm.jfrog.io/artifactory/api/pypi/dress-review-pypi-local/  -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} dist/*
+          twine upload --repository-url https://trialo3lkne.jfrog.io/artifactory/api/pypi/pythonweaviate-pypi-local/  -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} dist/*
