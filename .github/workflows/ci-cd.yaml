@@ -19,7 +19,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.JFROG_URL }}/weaviate-docker-local/demoweaviate:latest .
+#docker build -t ${{ secrets.JFROG_URL }}/weaviate-docker-local/demoweaviate:latest .
+          docker build -t https://trialo3lkne.jfrog.io/weaviate-docker-local/demoweaviate:latest .
 
       - name: Push Docker image to JFrog
         run: |
