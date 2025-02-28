@@ -9,7 +9,8 @@ _ = load_dotenv(find_dotenv("./.config/.env"))
 
 class Setting:
     OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', "")
-    WEAVIATE_API_KEY = os.environ.get('WEAVIATE_API_KEY', "")
+#    WEAVIATE_API_KEY = os.environ.get('WEAVIATE_API_KEY', "")
+    WEAVIATE_API_KEY = "3CaFCPn5ggEMrly6sgw1wkTplcMHb5icf5oV"
     WEAVIATE_URL = os.environ.get('WEAVIATE_URL', "")
 
 
