@@ -25,14 +25,5 @@ jobs:
         run: |
           docker push trialo3lkne.jfrog.io/weaviate-docker-local/demo-weaviate:latest
 
-      - name: Collect build Metadata & Environment Info
-        run: |
-          jfrog rt  my-build ${{ github.run_number }}
-          jfrog rt build-collect-env dress-review-build ${{ github.run_number }}
-
-      - name: Publish Build Info to JFrog
-        run: |
-          jfrog rt build-publish dress-review-build ${{ github.run_number }}
-        
 
 

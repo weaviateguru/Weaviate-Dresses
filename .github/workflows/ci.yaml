@@ -30,9 +30,13 @@ jobs:
         uses: jfrog/setup-jfrog-cli@v4
 
 
-      - name: Upload package to Artifactory
+      # - name: Upload package to Artifactory
+      #   run: |
+      #     twine upload --repository-url https://trialo3lkne.jfrog.io/artifactory/api/pypi/pythonweaviate-pypi-local/  -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} dist/*
+
+      - name: Configure JFrog CLI
         run: |
-          twine upload --repository-url https://trialo3lkne.jfrog.io/artifactory/api/pypi/pythonweaviate-pypi-local/  -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} dist/*
+          jfrog config add my-jfrog-server --url=https://trialo3lkne.jfrog.io --user=${{ secrets.JFROG_USERNAME }} --password=${{ secrets.JFROG_PASSWORD }} --interactive=false
 
       - name: Collect build Metadata & Environment Info
         run: |
