@@ -38,11 +38,11 @@ jobs:
         run: |
           jfrog config add my-jfrog-server --url=https://trialo3lkne.jfrog.io --user=${{ secrets.JFROG_USERNAME }} --password=${{ secrets.JFROG_PASSWORD }} --interactive=false
 
-      - name: Collect build Metadata & Environment Info
+            - name: Collect Git Metadata & Environment Info
         run: |
           jfrog rt  my-build ${{ github.run_number }}
-          jfrog rt build-collect-env dress-review-build ${{ github.run_number }}
+          jfrog rt build-collect-env my-build ${{ github.run_number }}
 
       - name: Publish Build Info to JFrog
         run: |
-          jfrog rt build-publish dress-review-build ${{ github.run_number }}
+          jfrog rt build-publish my-build ${{ github.run_number }}
