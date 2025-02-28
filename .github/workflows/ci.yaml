@@ -33,3 +33,12 @@ jobs:
       - name: Upload package to Artifactory
         run: |
           twine upload --repository-url https://trialo3lkne.jfrog.io/artifactory/api/pypi/pythonweaviate-pypi-local/  -u ${{ secrets.JFROG_USERNAME }} -p ${{ secrets.JFROG_PASSWORD }} dist/*
+
+      - name: Collect build Metadata & Environment Info
+        run: |
+          jfrog rt  my-build ${{ github.run_number }}
+          jfrog rt build-collect-env dress-review-build ${{ github.run_number }}
+
+      - name: Publish Build Info to JFrog
+        run: |
+          jfrog rt build-publish dress-review-build ${{ github.run_number }}
