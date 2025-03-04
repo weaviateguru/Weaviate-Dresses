@@ -72,8 +72,9 @@ jobs:
           IMAGE_NAME: dress-review-dev-docker-local
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
           docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:latest"
+        # docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+          
         
       # Add Docker build info
       - name: Add Docker Build Info
