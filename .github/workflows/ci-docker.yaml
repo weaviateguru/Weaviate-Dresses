@@ -26,19 +26,14 @@ jobs:
       - name: Install JFrog CLI
         uses: jfrog/setup-jfrog-cli@v4
 
-      # Configure JFrog CLI with Artifactory credential
+        # Configure JFrog CLI with Artifactory credential
       - name: Configure JFrog CLI
         env:
-          # JFROG_URL: ${{ secrets.JFROG_URL }}
-          JFROG_URL: "htts://trialo3lkne.jfrog.io"
+          JFROG_URL: ${{ secrets.JFROG_URL }}
           JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
-          JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
+          JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
         run: |
-          jfrog config add artifactory-server \
-            --url "$JFROG_URL" \
-            --user "$JFROG_USERNAME" \
-            --password "$JF_PASSWORD"
-          jfrog config show
+          jfrog config add artifactory-server --url="$JFROG_URL" --user="$JFROG_USERNAME" --password="$JFROG_PASSWORD" --interactive=false
 
       # Log into JFrog Artifactory Docker registry
       - name: Log into JFrog Docker Registry
