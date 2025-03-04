@@ -8,7 +8,7 @@ PACKAGE_NAME="dress-review-dev-pypi-local"
 PACKAGE_VERSION=""
 PACKAGE_FILE="dist/dress_review-0.1.0-py3-none-any.whl"
 BUILD_NAME="build-and-push"   
-BUILD_NUMBER="17"
+BUILD_NUMBER="3"
 JFROG_CLI="jf"
 
 
