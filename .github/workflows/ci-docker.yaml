@@ -40,8 +40,8 @@ jobs:
         env:
           JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
           JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
-          JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
-        run: echo "$JF_PASSWORD" | docker login "$JFROG_DOCKER_REGISTRY" -u "$JFROG_USERNAME" --password-stdin
+          JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
+        run: echo "$JFROG_PASSWORD" | docker login "$JFROG_DOCKER_REGISTRY" -u "$JFROG_USERNAME" --password-stdin
 
       # Build and tag Docker image
       - name: Build Docker image
