@@ -1,0 +1,65 @@
+
+name: Build and Push to JFrog
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-versions: '3.9'
+      
+      # Install JFrog CLI
+      - name: Install JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+
+      # Configure JFrog CLI with Artifactory credential
+      - name: Configure JFrog CLI
+        env:
+          JFROG_URL: ${{ secrets.JFROG_URL }}
+          JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
+          JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
+        run: |
+          jfrog config add artifactory-server --url="$JFROG_URL" --user="$JFROG_USERNAME" --password="$JFROG_PASSWORD" --interactive=false
+
+      # Install Python dependencies
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel
+ 
+      # Build Python packagies
+      - name: Build Package
+        run: python setup.py sdist bdist_wheel
+
+      # Upload Python package to JFrog Artifactory
+      - name: Upload Python package to Artifactory
+        run: |
+          jfrog rt upload "dist/*" "dress-review-dev-pypi/" \
+            --build-name="${{ github.job }}" \
+            --build-number="${{ github.run_number }}"
+        
+      # collect environment variables for build info
+      - name: Collect build environment
+        run: |
+          jfrog rt build-collect-env "${{ github.job }}" "${{ github.run_number }}"
+
+      # Publish build info to Artifactory
+      - name: Publish build info
+        run: |
+          jfrog rt build-publish "${{ github.job }}" "${{ github.run_number }}"
