@@ -31,12 +31,12 @@ jobs:
         env:
           JFROG_URL: ${{ secrets.JFROG_URL }}
           JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
-          JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
         run: |
           jfrog config add artifactory-server \
             --url "$JFROG_URL" \
             --user "$JFROG_USERNAME" \
-            --password "$JFROG_PASSWORD"
+            --password "$JF_ACCESS_TOKEN"
           jfrog config show
 
       # Log into JFrog Artifactory Docker registry
@@ -44,8 +44,8 @@ jobs:
         env:
           JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
           JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
-          JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
-        run: echo "$JFROG_PASSWORD" | docker login "$JFROG_DOCKER_REGISTRY" -u "$JFROG_USERNAME" --password-stdin
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+        run: echo "$JF_ACCESS_TOKEN" | docker login "$JFROG_DOCKER_REGISTRY" -u "$JFROG_USERNAME" --password-stdin
 
       # Build and tag Docker image
       - name: Build Docker image
@@ -72,9 +72,8 @@ jobs:
           IMAGE_NAME: dress-review-dev-docker-local
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:latest"
           docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
-          
+          docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:latest"
         
       # Add Docker build info
       - name: Add Docker Build Info
