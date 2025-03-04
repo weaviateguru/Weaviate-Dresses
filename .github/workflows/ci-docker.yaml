@@ -32,12 +32,12 @@ jobs:
           # JFROG_URL: ${{ secrets.JFROG_URL }}
           JFROG_URL: "htts://trialo3lkne.jfrog.io"
           JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
-          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+          JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
         run: |
           jfrog config add artifactory-server \
             --url "$JFROG_URL" \
             --user "$JFROG_USERNAME" \
-            --password "$JF_ACCESS_TOKEN"
+            --password "$JF_PASSWORD"
           jfrog config show
 
       # Log into JFrog Artifactory Docker registry
@@ -45,8 +45,8 @@ jobs:
         env:
           JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
           JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
-          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
-        run: echo "$JF_ACCESS_TOKEN" | docker login "$JFROG_DOCKER_REGISTRY" -u "$JFROG_USERNAME" --password-stdin
+          JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
+        run: echo "$JF_PASSWORD" | docker login "$JFROG_DOCKER_REGISTRY" -u "$JFROG_USERNAME" --password-stdin
 
       # Build and tag Docker image
       - name: Build Docker image
