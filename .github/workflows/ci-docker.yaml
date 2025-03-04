@@ -29,7 +29,8 @@ jobs:
       # Configure JFrog CLI with Artifactory credential
       - name: Configure JFrog CLI
         env:
-          JFROG_URL: ${{ secrets.JFROG_URL }}
+          # JFROG_URL: ${{ secrets.JFROG_URL }}
+          JFROG_URL: "htts://trialo3lkne.jfrog.io"
           JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
           JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
         run: |
@@ -56,32 +57,24 @@ jobs:
         run: |
           docker buildx build --platform linux/amd64 -t "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" --load .
          
-      # # Tag Docker image
-      # - name: Tag Docker image
-      #   env:
-      #     JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
-      #     IMAGE_NAME: dress-review-dev-docker-local
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   run: |
-      #     docker tag "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:latest"
-
-      # # Push docker image to JFrog Artifactory
-      # - name: Push Docker Image
-      #   env:
-      #     JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
-      #     IMAGE_NAME: dress-review-dev-docker-local
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   run: |
-      #     docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
-      #     docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:latest"
-
-      - name: Build Docker image
+      # Tag Docker image
+      - name: Tag Docker image
+        env:
+          JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
+          IMAGE_NAME: dress-review-dev-docker-local
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t ${{ secrets.JFROG_URL }}/dress-review-docker-local/dress-review:latest .
+          docker tag "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:latest"
 
-      - name: Push Docker image to JFrog
+      # Push docker image to JFrog Artifactory
+      - name: Push Docker Image
+        env:
+          JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
+          IMAGE_NAME: dress-review-dev-docker-local
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker push ${{ secrets.JFROG_URL }}/dress-review-docker-local/dress-review:latest
+          docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+          docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:latest"
         
       # Add Docker build info
       - name: Add Docker Build Info
