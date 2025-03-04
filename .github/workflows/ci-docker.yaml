@@ -73,7 +73,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:latest"
-        # docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+          docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
           
         
       # Add Docker build info
