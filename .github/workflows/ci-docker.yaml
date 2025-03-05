@@ -13,84 +13,100 @@ jobs:
   build-and-push-docker:
     runs-on: ubuntu-latest
 
+
     steps:
-      # Checkout the repository code
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      # Set up Docker Buildx
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # Install JFrog CLI
-      - name: Install JFrog CLI
-        uses: jfrog/setup-jfrog-cli@v4
-
-        # Configure JFrog CLI with Artifactory credential
-      - name: Configure JFrog CLI
-        env:
-          JFROG_URL: ${{ secrets.JFROG_URL }}
-          JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
-          JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
-        run: |
-          jfrog config add artifactory-server --url="$JFROG_URL" --user="$JFROG_USERNAME" --password="$JFROG_PASSWORD" --interactive=false
-
-      # Log into JFrog Artifactory Docker registry
       - name: Log into JFrog Docker Registry
-        env:
-          JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
-          JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
-          JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
-        run: echo "$JFROG_PASSWORD" | docker login "$JFROG_DOCKER_REGISTRY" -u "$JFROG_USERNAME" --password-stdin
+        run: echo "${{ secrets.JFROG_PASSWORD }}" | docker login ${{ secrets.JFROG_URL }} -u ${{ secrets.JFROG_USERNAME }} --password-stdin
 
-      # Build and tag Docker image
       - name: Build Docker image
-        env:
-          JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
-          IMAGE_NAME: dress-review-dev-docker-local
-          IMAGE_TAG: ${{ github.sha }} # use commit SHA as tag
         run: |
-          docker buildx build --platform linux/amd64 -t "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" --load .
+          docker build -t trialo3lkne.jfrog.io/weaviate-docker-local/demo-weaviate:latest .
+
+      - name: Push Docker image to JFrog
+        run: |
+          docker push trialo3lkne.jfrog.io/weaviate-docker-local/demo-weaviate:latest
+
+    # steps:
+    #   # Checkout the repository code
+    #   - name: Checkout repository
+    #     uses: actions/checkout@v4
+      
+    #   # Set up Docker Buildx
+    #   - name: Set up Docker Buildx
+    #     uses: docker/setup-buildx-action@v3
+
+    #   # Install JFrog CLI
+    #   - name: Install JFrog CLI
+    #     uses: jfrog/setup-jfrog-cli@v4
+
+    #     # Configure JFrog CLI with Artifactory credential
+    #   - name: Configure JFrog CLI
+    #     env:
+    #       JFROG_URL: ${{ secrets.JFROG_URL }}
+    #       JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
+    #       JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
+    #     run: |
+    #       jfrog config add artifactory-server --url="$JFROG_URL" --user="$JFROG_USERNAME" --password="$JFROG_PASSWORD" --interactive=false
+
+    #   # Log into JFrog Artifactory Docker registry
+    #   - name: Log into JFrog Docker Registry
+    #     env:
+    #       JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
+    #       JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
+    #       JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
+    #     run: echo "$JFROG_PASSWORD" | docker login "$JFROG_DOCKER_REGISTRY" -u "$JFROG_USERNAME" --password-stdin
+
+    #   # Build and tag Docker image
+    #   - name: Build Docker image
+    #     env:
+    #       JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
+    #       IMAGE_NAME: dress-review-dev-docker-local
+    #       IMAGE_TAG: ${{ github.sha }} # use commit SHA as tag
+    #     run: |
+    #       docker buildx build --platform linux/amd64 -t "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" --load .
          
-      # Tag Docker image
-      - name: Tag Docker image
-        env:
-          JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
-          IMAGE_NAME: dress-review-dev-docker-local
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker tag "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:latest"
+    #   # Tag Docker image
+    #   - name: Tag Docker image
+    #     env:
+    #       JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
+    #       IMAGE_NAME: dress-review-dev-docker-local
+    #       IMAGE_TAG: ${{ github.sha }}
+    #     run: |
+    #       docker tag "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:latest"
 
-      # Push docker image to JFrog Artifactory
-      - name: Push Docker Image
-        env:
-          JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
-          IMAGE_NAME: dress-review-dev-docker-local
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
-          docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:latest"
+    #   # Push docker image to JFrog Artifactory
+    #   - name: Push Docker Image
+    #     env:
+    #       JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
+    #       IMAGE_NAME: dress-review-dev-docker-local
+    #       IMAGE_TAG: ${{ github.sha }}
+    #     run: |
+    #       docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    #       docker push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:latest"
         
-      # Add Docker build info
-      - name: Add Docker Build Info
-        env:
-          JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
-          IMAGE_NAME: dress-review-dev-docker-local
-          IMAGE_TAG: ${{ github.sha }}
-        run:
-          jfrog rt docker-push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" dress-review-dev-docker-local --build-name="${{ github.job }}" --build-number="${{ github.run_number }}"
+    #   # Add Docker build info
+    #   - name: Add Docker Build Info
+    #     env:
+    #       JFROG_DOCKER_REGISTRY: ${{ secrets.JFROG_DOCKER_REGISTRY }}
+    #       IMAGE_NAME: dress-review-dev-docker-local
+    #       IMAGE_TAG: ${{ github.sha }}
+    #     run:
+    #       jfrog rt docker-push "$JFROG_DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" dress-review-dev-docker-local --build-name="${{ github.job }}" --build-number="${{ github.run_number }}"
 
-      # Collect environment variables for build info
-      - name: Collect Build Environment
-        run: |
-          jfrog rt build-collect-env "${{ github.job }}" "${{ github.run_number }}"
+    #   # Collect environment variables for build info
+    #   - name: Collect Build Environment
+    #     run: |
+    #       jfrog rt build-collect-env "${{ github.job }}" "${{ github.run_number }}"
 
-      # Publish build info to Artifactory
-      - name: Publish Build info
-        run: |
-          jfrog rt build-publish "${{ github.job }}" "${{ github.run_number }}"
+    #   # Publish build info to Artifactory
+    #   - name: Publish Build info
+    #     run: |
+    #       jfrog rt build-publish "${{ github.job }}" "${{ github.run_number }}"
 
-      # Log out of Docker registry
-      - name: Log out of Docker registry
-        run: |
-          docker logout ${{ secrets.JFROG_DOCKER_REGISTRY }}
+    #   # Log out of Docker registry
+    #   - name: Log out of Docker registry
+    #     run: |
+    #       docker logout ${{ secrets.JFROG_DOCKER_REGISTRY }}
